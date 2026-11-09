@@ -1,0 +1,16 @@
+{% extends "network/base.html" %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+<div class="narrow-page">
+  <a class="back-link" href="{% url 'profile' user.username %}">← Back to profile</a>
+  <section class="card form-card">
+    <p class="eyebrow">MAKE IT YOURS</p><h1>Edit your profile</h1><p class="heading-copy">A few words help people get to know you.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="field-group"><label for="{{ form.bio.id_for_label }}">Your bio</label>{{ form.bio }}<div class="field-hint">Up to 200 characters. Keep it you.</div>{% for error in form.bio.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <button class="button button-primary" type="submit">Save profile</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

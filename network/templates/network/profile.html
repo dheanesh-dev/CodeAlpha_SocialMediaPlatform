@@ -1,0 +1,41 @@
+{% extends "network/base.html" %}
+{% block title %}@{{ person.username }}{% endblock %}
+{% block content %}
+<section class="card profile-hero">
+  <div class="profile-cover" aria-hidden="true"><span class="cover-orbit orbit-one"></span><span class="cover-orbit orbit-two"></span><span class="cover-star">✳</span></div>
+  <div class="profile-content">
+    <span class="avatar avatar-profile avatar-gradient">{{ person.username|slice:":1"|upper }}</span>
+    <div class="profile-identity"><p class="eyebrow">CIRCLE MEMBER</p><h1>{{ person.username }}</h1><p class="person-handle">@{{ person.username }}</p></div>
+    <div class="profile-action">
+      {% if user.is_authenticated %}
+        {% if user == person %}
+          <a class="button button-outline" href="{% url 'edit_profile' %}">Edit profile</a>
+        {% else %}
+          <form method="post" action="{% url 'toggle_follow' person.username %}">
+            {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="button {% if is_following %}button-soft{% else %}button-primary{% endif %}" type="submit">{% if is_following %}Following · Unfollow{% else %}Follow{% endif %}</button>
+          </form>
+        {% endif %}
+      {% else %}
+        <a class="button button-primary" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in to follow</a>
+      {% endif %}
+    </div>
+    <p class="profile-bio">{{ person_profile.bio|default:"This member is still writing their introduction." }}</p>
+    <div class="profile-stats">
+      <div><strong>{{ page_obj.paginator.count }}</strong><span>Posts</span></div>
+      <div><strong>{{ followers_total }}</strong><span>Followers</span></div>
+      <div><strong>{{ following_total }}</strong><span>Following</span></div>
+      <div class="joined-date"><span>Joined</span><strong>{{ person.date_joined|date:"M Y" }}</strong></div>
+    </div>
+  </div>
+</section>
+<div class="section-heading profile-post-heading"><div><p class="eyebrow">FROM THE PROFILE</p><h2>{{ person.username }}’s posts</h2></div></div>
+<div class="post-list">
+  {% for post in page_obj %}
+    {% include "network/partials/post_card.html" %}
+  {% empty %}
+    <div class="card empty-state"><span class="empty-icon" aria-hidden="true">✎</span><h3>No posts yet</h3><p>When {{ person.username }} shares a post, it’ll show up here.</p></div>
+  {% endfor %}
+</div>
+{% include "network/partials/pagination.html" %}
+{% endblock %}

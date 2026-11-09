@@ -1,0 +1,42 @@
+{% extends "network/base.html" %}
+{% block title %}Discover people{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">YOUR NEXT HELLO IS HERE</p><h1>Find your <span class="text-accent">people.</span></h1><p class="heading-copy">Meet the voices making Circle a little brighter.</p></div>
+</div>
+<section class="card discover-toolbar">
+  <form class="search-form" method="get" action="{% url 'discover' %}">
+    <label class="sr-only" for="people-search">Search people</label>
+    <span class="search-icon" aria-hidden="true">⌕</span>
+    <input id="people-search" class="form-control" type="search" name="q" value="{{ query }}" placeholder="Search by username">
+    <button class="button button-primary" type="submit">Search</button>
+    {% if query %}<a class="button button-quiet" href="{% url 'discover' %}">Clear</a>{% endif %}
+  </form>
+</section>
+
+<section class="people-grid" aria-label="People on Circle">
+  {% for person in page_obj %}
+    <article class="card person-card">
+      <div class="person-top"><span class="avatar avatar-large avatar-gradient">{{ person.username|slice:":1"|upper }}</span>
+        {% if person.is_followed %}<span class="follow-status"><span class="live-dot"></span> Following</span>{% endif %}
+      </div>
+      <h2><a href="{% url 'profile' person.username %}">{{ person.username }}</a></h2>
+      <p class="person-handle">@{{ person.username }}</p>
+      <p class="person-bio">{{ person.profile.bio|default:"Still finding the words for their bio." }}</p>
+      <div class="mini-stats"><span><strong>{{ person.posts_total }}</strong> posts</span><span><strong>{{ person.followers_total }}</strong> followers</span></div>
+      <div class="person-actions">
+        <a class="button button-outline button-full" href="{% url 'profile' person.username %}">View profile</a>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'toggle_follow' person.username %}">
+            {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="button {% if person.is_followed %}button-soft{% else %}button-primary{% endif %} button-full" type="submit">{% if person.is_followed %}Following · Unfollow{% else %}Follow{% endif %}</button>
+          </form>
+        {% endif %}
+      </div>
+    </article>
+  {% empty %}
+    <div class="card empty-state empty-wide"><span class="empty-icon" aria-hidden="true">⌕</span><h3>{% if query %}No people found{% else %}You’re the first here{% endif %}</h3><p>{% if query %}Try a different username.{% else %}When people join Circle, you’ll find them here.{% endif %}</p></div>
+  {% endfor %}
+</section>
+{% include "network/partials/pagination.html" %}
+{% endblock %}

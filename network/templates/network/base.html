@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7fb">
+  <title>{% block title %}Circle{% endblock %} · Circle</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="Circle home">
+        <span class="brand-mark" aria-hidden="true">c</span><span>circle</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}"><span aria-hidden="true">⌂</span> Home</a>
+        <a class="nav-link {% if request.resolver_match.url_name == 'discover' %}active{% endif %}" href="{% url 'discover' %}"><span aria-hidden="true">⌕</span> Discover</a>
+        {% if user.is_authenticated %}
+          <a class="nav-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" href="{% url 'profile' user.username %}"><span aria-hidden="true">◉</span> My profile</a>
+        {% endif %}
+      </nav>
+      <div class="header-actions">
+        {% if user.is_authenticated %}
+          <a class="user-chip" href="{% url 'profile' user.username %}">
+            <span class="avatar avatar-small">{{ user.username|slice:":1"|upper }}</span><span>@{{ user.username }}</span>
+          </a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="button button-quiet button-small" type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a class="button button-quiet button-small" href="{% url 'login' %}">Log in</a>
+          <a class="button button-primary button-small" href="{% url 'register' %}">Join Circle</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="page-shell">
+    {% if messages %}
+      <div class="messages" aria-live="polite">
+        {% for message in messages %}
+          <div class="message message-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner"><a class="brand brand-footer" href="{% url 'home' %}"><span class="brand-mark" aria-hidden="true">c</span><span>circle</span></a><span>A little more connected, every day.</span></div>
+  </footer>
+  <script src="{% static 'js/site.js' %}" defer></script>
+</body>
+</html>
+

@@ -1,0 +1,31 @@
+<article class="card post-card">
+  <div class="post-header">
+    <a class="author-block" href="{% url 'profile' post.author.username %}">
+      <span class="avatar avatar-muted">{{ post.author.username|slice:":1"|upper }}</span>
+      <span class="author-meta"><strong>{{ post.author.username }}</strong><small>@{{ post.author.username }}</small></span>
+    </a>
+    <time class="post-time" datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"M j, Y · g:i A" }}</time>
+  </div>
+  <div class="post-body"><p>{{ post.body|linebreaksbr }}</p></div>
+  <div class="post-footer">
+    <div class="post-stats">
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'toggle_like' post.pk %}">
+          {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button class="action-button {% if post.is_liked %}is-liked{% endif %}" type="submit" aria-label="{% if post.is_liked %}Unlike{% else %}Like{% endif %} post by {{ post.author.username }}">
+            <span aria-hidden="true">{% if post.is_liked %}♥{% else %}♡{% endif %}</span> <span>{{ post.likes_total }}</span>
+          </button>
+        </form>
+      {% else %}
+        <span class="stat-item"><span aria-hidden="true">♡</span> {{ post.likes_total }}</span>
+      {% endif %}
+      <a class="action-button" href="{% url 'post_detail' post.pk %}"><span aria-hidden="true">◷</span> <span>{{ post.comments_total }} comment{{ post.comments_total|pluralize }}</span></a>
+    </div>
+    {% if user == post.author %}
+      <form method="post" action="{% url 'delete_post' post.pk %}" data-confirm="Delete this post? This cannot be undone.">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="icon-button danger-text" type="submit" aria-label="Delete your post" title="Delete post">⌫</button>
+      </form>
+    {% endif %}
+  </div>
+</article>

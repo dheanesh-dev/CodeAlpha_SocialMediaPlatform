@@ -1,0 +1,70 @@
+{% extends "network/base.html" %}
+{% block title %}Your community{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">YOUR COMMUNITY, IN ONE PLACE</p>
+    <h1>A good day to <span class="text-accent">connect.</span></h1>
+    <p class="heading-copy">Catch up with people, share a thought, and find your next favorite voice.</p>
+  </div>
+  <a class="button button-outline" href="{% url 'discover' %}">Find your people <span aria-hidden="true">→</span></a>
+</div>
+
+<div class="feed-layout">
+  <section class="feed-column" aria-label="Community feed">
+    {% if user.is_authenticated %}
+      <section class="card composer-card">
+        <div class="composer-top">
+          <span class="avatar avatar-gradient">{{ user.username|slice:":1"|upper }}</span>
+          <div><p class="card-kicker">YOUR SPACE</p><h2>What’s on your mind?</h2></div>
+        </div>
+        <form method="post" action="{% url 'create_post' %}">
+          {% csrf_token %}
+          {{ post_form.body }}
+          <div class="form-foot"><span class="char-counter" data-counter data-limit="500">0 / 500</span><button class="button button-primary" type="submit">Share post <span aria-hidden="true">↗</span></button></div>
+        </form>
+      </section>
+    {% else %}
+      <section class="card welcome-card">
+        <span class="welcome-icon" aria-hidden="true">✳</span>
+        <p class="eyebrow">A SMALLER, KINDER SOCIAL SPACE</p>
+        <h2>Good conversations start somewhere.</h2>
+        <p>Join Circle to share posts, meet people, and follow the voices you enjoy.</p>
+        <div class="button-row"><a class="button button-primary" href="{% url 'register' %}">Create an account</a><a class="button button-outline" href="{% url 'login' %}">I already have one</a></div>
+      </section>
+    {% endif %}
+
+    <div class="section-heading"><div><p class="eyebrow">THE LATEST</p><h2>Community feed</h2></div><span class="live-label"><span class="live-dot"></span> Fresh posts</span></div>
+    <div class="post-list">
+      {% for post in page_obj %}
+        {% include "network/partials/post_card.html" %}
+      {% empty %}
+        <div class="card empty-state"><span class="empty-icon" aria-hidden="true">☼</span><h3>It’s quiet here for now</h3><p>Be the first to share something with the community.</p></div>
+      {% endfor %}
+    </div>
+    {% include "network/partials/pagination.html" %}
+  </section>
+
+  <aside class="feed-sidebar" aria-label="About Circle">
+    <section class="card side-card side-highlight">
+      <div class="side-art" aria-hidden="true"><span>✳</span><i></i><b></b></div>
+      <p class="eyebrow">A PLACE TO BELONG</p>
+      <h2>Make room for good things.</h2>
+      <p>Share what matters, celebrate little wins, and keep up with your circle.</p>
+      <a class="text-link" href="{% url 'discover' %}">Explore the community <span aria-hidden="true">→</span></a>
+    </section>
+    {% if user.is_authenticated %}
+      <section class="card side-card">
+        <div class="section-heading section-heading-tight"><div><p class="eyebrow">QUICK LINK</p><h3>Your profile</h3></div><span aria-hidden="true">↗</span></div>
+        <p class="muted">Give people a little introduction to who you are.</p>
+        <a class="button button-soft button-full" href="{% url 'edit_profile' %}">Edit your bio</a>
+      </section>
+    {% else %}
+      <section class="card side-card side-note">
+        <span class="note-icon" aria-hidden="true">♡</span><h3>Bring your people along</h3><p class="muted">Your next favorite conversation could start with a hello.</p>
+        <a class="text-link" href="{% url 'register' %}">Join Circle <span aria-hidden="true">→</span></a>
+      </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

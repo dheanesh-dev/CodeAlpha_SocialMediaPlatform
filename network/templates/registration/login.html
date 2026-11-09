@@ -1,0 +1,22 @@
+{% extends "network/base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="auth-layout">
+  <aside class="auth-aside"><div class="auth-spark" aria-hidden="true">♡</div><p class="eyebrow">GOOD TO SEE YOU AGAIN</p><h1>Your circle<br>missed <span class="text-accent">you.</span></h1><p>Pick up where you left off and see what your people are sharing.</p><div class="auth-aside-note"><span>✦</span> The best conversations keep going.</div></aside>
+  <section class="card form-card auth-card">
+    <p class="eyebrow">WELCOME BACK</p><h2>Log in to Circle</h2><p class="muted">Your community is just a moment away.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="field-group"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+          {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+      {% endfor %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <button class="button button-primary button-full" type="submit">Log in <span aria-hidden="true">→</span></button>
+    </form>
+    <p class="form-switch">New around here? <a href="{% url 'register' %}">Create an account</a></p>
+  </section>
+</div>
+{% endblock %}
